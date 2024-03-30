@@ -20,6 +20,7 @@ public class EmailService {
         String emailContent = String.format(EMAIL_TEMPLATE, recipientName);
         MimeMessage message = mailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        helper.setFrom("kdheeraj1502@gmail.com");
         helper.setTo(recipientMail);
         helper.setSubject(subject);
         helper.setText(emailContent);

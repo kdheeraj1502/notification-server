@@ -1,14 +1,18 @@
 package community.notificationserver.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import community.notificationserver.entity.DeviceDetails;
 import community.notificationserver.entity.DeviceInfoEntity;
+import community.notificationserver.entity.UserDetails;
 import community.notificationserver.entity.UserInfoEntity;
+import community.notificationserver.mapper.DeviceMapper;
 import community.notificationserver.model.EmailDeviceAndContentDetails;
 import community.notificationserver.model.RequiredEmailContentEvent;
 import community.notificationserver.repository.DeviceInfoRepository;
 import community.notificationserver.model.EmailRequestBody;
 import community.notificationserver.repository.UserInfoRepository;
 import community.notificationserver.service.EmailNotificationService;
+import community.notificationserver.service.ManagementService;
 import community.notificationserver.utility.NotificationUtility;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
@@ -30,55 +34,63 @@ public class EmailNotificationServiceImpl implements EmailNotificationService {
   private final RedisCacheService redisCacheService;
   private final DeviceInfoRepository deviceInfoRepository;
   private final UserInfoRepository userInfoRepository;
+  private final ManagementService managementService;
+  private final DeviceMapper deviceMapper;
 
   public EmailNotificationServiceImpl(
           KafkaTemplate<String, String> kafkaTemplate,
           RedisCacheService redisCacheService,
-          DeviceInfoRepository deviceInfoRepository, UserInfoRepository userInfoRepository) {
+          DeviceInfoRepository deviceInfoRepository, UserInfoRepository userInfoRepository, ManagementService managementService, DeviceMapper deviceMapper) {
     this.kafkaTemplate = kafkaTemplate;
     this.redisCacheService = redisCacheService;
     this.deviceInfoRepository = deviceInfoRepository;
     this.userInfoRepository = userInfoRepository;
+      this.managementService = managementService;
+      this.deviceMapper = deviceMapper;
   }
 
   @Override
+  @Transactional
   public boolean publishNotification(EmailRequestBody emailRequestBody) {
-    System.out.println(userInfoRepository.findAll());
-    System.out.println(deviceInfoRepository.findAll());
-    return true;
+    List<String> recipientUserIds =
+        emailRequestBody.getTo().stream().map(EmailRequestBody.Recipient::getUserId).toList();
+    List<String> unavailableUserIds = new ArrayList<>();
+    List<UserDetails> userDetailsList = new ArrayList<>();
+    for (String userId : recipientUserIds) {
+      Object details = redisCacheService.getValue(userId);
+      if (details != null) {
+        if(details instanceof UserDetails) {
+          UserDetails dd = (UserDetails) details;
+          userDetailsList.add(dd);
+        }
+      } else {
+        unavailableUserIds.add(userId);
+      }
+    }
+    if (!unavailableUserIds.isEmpty()) {
+      Collection<UserInfoEntity> userInfoEntities =
+              userInfoRepository.findAllByUserIdIn(unavailableUserIds);
+
+      for (UserInfoEntity userInfoEntity : userInfoEntities) {
+        UserDetails userDetails =  deviceMapper.entityToUserDto(userInfoEntity);
+        userDetailsList.add(userDetails);
+      }
+    }
+
+    return createMessagePayload(emailRequestBody, userDetailsList);
   }
 
- // @Override
-  @Transactional
-  public boolean publishNotification1(EmailRequestBody emailRequestBody) {
-    List<Integer> recipientUserIds =
-        emailRequestBody.getTo().stream().map(EmailRequestBody.Recipient::getUserId).toList();
-    List<UserInfoEntity> userInfoEntities = new ArrayList<>();
-    List<Integer> unAvailableUserIds = new ArrayList<>();
-    for (int userId : recipientUserIds) {
-      UserInfoEntity userInfo = redisCacheService.getValue(userId);
-      if (userInfo == null) {
-        unAvailableUserIds.add(userId);
-      } else {
-        userInfoEntities.add(userInfo);
-      }
-    }
-    if (!unAvailableUserIds.isEmpty()) {
-      Collection<DeviceInfoEntity> deviceInfoEntities =
-          deviceInfoRepository.findAllByUserInfoUserIdIn(unAvailableUserIds);
-      for (DeviceInfoEntity deviceInfoEntity : deviceInfoEntities) {
-        userInfoEntities.add(deviceInfoEntity.getUserInfo());
-      }
-    }
-
+  private boolean createMessagePayload(EmailRequestBody emailRequestBody, List<UserDetails> userDetails) {
     List<EmailDeviceAndContentDetails> emailDeviceAndContentDetails = new ArrayList<>();
-    userInfoEntities.stream()
+
+    userDetails.stream()
         .forEach(
             u -> {
               EmailDeviceAndContentDetails emailDeviceContent = new EmailDeviceAndContentDetails();
               emailDeviceContent.setEventId(UUID.randomUUID());
               emailDeviceContent.setUserName(u.getUserName());
               emailDeviceContent.setEmailAddress(u.getEmailAddress());
+              emailDeviceContent.setDeviceTokens(u.getDeviceTokenList());
               emailDeviceContent.setEmailContent(emailRequestBody.getSubject());
               emailDeviceAndContentDetails.add(emailDeviceContent);
             });

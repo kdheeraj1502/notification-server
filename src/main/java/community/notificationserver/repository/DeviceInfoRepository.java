@@ -9,7 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public interface DeviceInfoRepository extends JpaRepository<DeviceInfoEntity, Integer> {
+public interface DeviceInfoRepository extends JpaRepository<DeviceInfoEntity, String> {
 
-    Collection<DeviceInfoEntity> findAllByUserInfoUserIdIn(List<Integer> userIds);
+    Collection<DeviceInfoEntity> findAllByUserInfoUserIdIn(List<String> userIds);
 }

@@ -1,5 +1,10 @@
 package community.notificationserver.configuration;
 
+import community.notificationserver.entity.DeviceDetails;
+import community.notificationserver.entity.DeviceInfoEntity;
+import community.notificationserver.entity.UserDetails;
+import community.notificationserver.entity.UserInfoEntity;
+import community.notificationserver.mapper.DeviceMapper;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +24,8 @@ public class RedisCacheConfig {
     }
 
     @Bean
-    public RedisTemplate<Integer, Object> redisTemplate() {
-        RedisTemplate<Integer, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
         return template;
     }

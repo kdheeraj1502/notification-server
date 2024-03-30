@@ -6,7 +6,7 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class NotificationUtility<T> {
-  final ObjectMapper objectMapper = new ObjectMapper();
+  static final ObjectMapper objectMapper = new ObjectMapper();
 
   public static <T> String toJson(final T object) throws JsonProcessingException {
     return objectMapper.writeValueAsString(object);
