@@ -1,14 +1,21 @@
+community/notificationserver/entity/DeviceDetails.class
 community/notificationserver/configuration/RedisCacheConfig.class
+community/notificationserver/mapper/DeviceMapper.class
 community/notificationserver/utility/NotificationUtility.class
+community/notificationserver/entity/UserDetails.class
 community/notificationserver/constant/NotificationConstants.class
 community/notificationserver/configuration/KafkaConsumerConfig.class
 community/notificationserver/service/impl/EmailService.class
+community/notificationserver/controller/RegisterUserController.class
 community/notificationserver/service/EmailNotificationService.class
 community/notificationserver/model/DeviceInfo.class
 community/notificationserver/service/WorkerService.class
+community/notificationserver/mapper/DeviceMapperImpl.class
 community/notificationserver/repository/UserInfoRepository.class
 community/notificationserver/entity/DeviceInfoEntity.class
+community/notificationserver/utility/DeviceTokenGenerator.class
 community/notificationserver/service/impl/EmailNotificationServiceImpl.class
+community/notificationserver/service/impl/ManagementServiceImpl.class
 community/notificationserver/configuration/KafkaTopicConfiguration.class
 community/notificationserver/model/RequiredEmailContentEvent.class
 community/notificationserver/entity/UserInfoEntity.class
@@ -22,4 +29,5 @@ community/notificationserver/repository/DeviceInfoRepository.class
 community/notificationserver/NotificationServerApplication.class
 community/notificationserver/model/EmailRequestBody.class
 community/notificationserver/controller/NotificationController.class
+community/notificationserver/service/ManagementService.class
 community/notificationserver/model/EmailDeviceAndContentDetails.class

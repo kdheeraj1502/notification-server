@@ -1,3 +1,4 @@
+/*
 package community.notificationserver.configuration;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
@@ -30,3 +31,4 @@ public class KafkaConsumerConfig {
         return new DefaultKafkaConsumerFactory<>(props);
     }
 }
+*/

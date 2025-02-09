@@ -1,3 +1,4 @@
+/*
 package community.notificationserver.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -31,12 +32,13 @@ public class WorkerService {
         try {
             EmailDeviceAndContentDetails emailContent =
                     NotificationUtility.parseJson(message, EmailDeviceAndContentDetails.class);
-            emailService.sendMail(emailContent.getEmailAddress(), emailContent.getUserName(), EMAIL_SUBJECT);
+          //  emailService.sendMail(emailContent.getEmailAddress(), emailContent.getUserName(), EMAIL_SUBJECT);
 
             logger.info("Successfully processed email notification for message: {}", message);
          //   acknowledgment.acknowledge(); // Manually acknowledge the message
-        } catch (JsonProcessingException | MessagingException e) {
+        } catch (JsonProcessingException e) { //| MessagingException e) {
             logger.error("Failed to process email notification for message: {}", message, e);
         }
     }
 }
+*/

@@ -5,13 +5,13 @@ CREATE TABLE PUSH_NOTIFICATION_SERVICE.user_info (
     email_address VARCHAR(255),
     mobile_number VARCHAR(20),
     country_code VARCHAR(5),
-    created_at TIMESTAMP
+    created_at datetime
 );
 CREATE TABLE PUSH_NOTIFICATION_SERVICE.device_info (
     id INT PRIMARY KEY,
     device_token VARCHAR(255),
     user_id INT,
-    last_logged_in_at TIMESTAMP,
+    last_logged_in_at datetime,
     FOREIGN KEY (user_id) REFERENCES user_info(user_id)
 );
 INSERT INTO PUSH_NOTIFICATION_SERVICE.user_info (user_id, user_name, email_address, mobile_number, country_code, created_at) VALUES (123, 'John Doe', 'john.doe@example.com', '1234567890', '+1', '2024-03-10T00:00:00');
